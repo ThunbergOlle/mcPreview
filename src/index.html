@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Minecraft Previewer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" media="screen" href="style.css" />
+</head>
+<body style="padding: 0; margin: 0;">
+    <canvas id="mainCanvas" style="padding: 0; margin: 0">
+
+    </canvas>
+    <script src="./scripts/three.js"></script>
+    <script src="./scripts/OrbitControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+
+    <script>
+        
+        // Socket setup
+        let socket = io.connect('http://127.0.0.1:4000/');
+
+        let renderer = new THREE.WebGLRenderer({canvas: document.getElementById("mainCanvas"), antialias: true});
+        renderer.setClearColor(0x000000);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild( renderer.domElement );
+
+        // Create a camera
+        // PERSPECTIVE CAMERA
+
+        let camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 1000);
+        camera.position.set( 0, 30, 0 );
+        
+        var controls = new THREE.OrbitControls( camera, renderer.domElement);
+        controls.target.set(0, 5, 0);
+        let scene = new THREE.Scene();
+
+        // ADDING CONTENT TO THE SCREEN
+        // Create MESH, GEOMETRY & MATERIAL
+        let geometry = new THREE.BoxGeometry(100, 100, 100);
+
+        // Add lights to the scene
+        let light = new THREE.AmbientLight(0xffffff, 1);
+        scene.add(light);
+
+        let loader = new THREE.ObjectLoader();
+        loader.load('steve.json', function(obj){
+            scene.add(obj);
+            obj.position.set(0,0,0)
+            render(obj);
+            socket.on('skinInputSuccess', function(data){
+                console.log(data.success);
+                obj.material.map = THREE.ImageUtils.loadTexture('steve.png');
+                obj.material.needsUpdate = true;
+            });
+        });
+
+        function render(){
+            controls.update();
+            requestAnimationFrame(render);
+            renderer.render(scene, camera);
+
+        }
+
+    </script>
+</body>
+</html>
