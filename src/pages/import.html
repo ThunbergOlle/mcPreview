@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+
 <!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
     <head>
         <meta charset="utf-8">
@@ -10,10 +8,12 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
     </head>
     <body>
+        <p>Please choose a skin to preview</p>
         <input type="file" id="fileinput" />
-        <button id="btn" onclick="">Send data</button>
         <script src="" async defer></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
     <script>
@@ -35,11 +35,8 @@
             console.log("size : " + file.size);
             console.log("type : " + file.type);
             console.log("date : " + file.lastModified);
+            window.close();
         }, false);
-
-
-
-
 
 
         if (window.File && window.FileReader && window.FileList && window.Blob) {
