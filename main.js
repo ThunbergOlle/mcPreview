@@ -3,18 +3,19 @@ const path = require('path');
 const url = require('url');
 const fs = require('fs');
 const socket = require('socket.io').listen(4000).sockets;
-const {app, BrowserWindow, Menu} = electron;
-
-
+const { app, BrowserWindow, Menu, shell } = electron;
+const os = require('os');
+const desktopCapturer = electron.desktopCapturer;
+const ipc = electron.ipcMain;
 // When the app is ready
 
 app.on('ready', () => {
-    win = new BrowserWindow({width: 800, height: 600});
+    win = new BrowserWindow({ width: 800, height: 600 });
     win.loadURL(url.format({
-        pathname: path.join(__dirname+'/src/index.html'),
+        pathname: path.join(__dirname + '/src/index.html'),
         protocal: 'file',
         slashes: true
-        
+
     }));
     const mainMenu = Menu.buildFromTemplate(mainMenutemplate);
     Menu.setApplicationMenu(mainMenu);
@@ -24,52 +25,46 @@ const mainMenutemplate = [{
     label: 'File',
     submenu: [
         {
-            label: 'Model type',
+            label: 'Import',
             submenu: [
                 {
-                    label: 'Skin'
-                },
-                {
-                    label: 'Block',
-                    click: function(){
-                        are_you_sure = new BrowserWindow({width: 230, height: 120, frame: false});
-                        are_you_sure.loadURL(url.format({
-                            pathname: path.join(__dirname+'/src/pages/are_you_sure/block.html'),
+                    label: 'Skin',
+                    click: function () {
+                        smallwin = new BrowserWindow({ width: 350, height: 300 });
+                        smallwin.loadURL(url.format({
+                            pathname: path.join(__dirname + '/src/pages/import.html'),
                             protocol: 'file',
                             slashes: true
                         }));
-                        are_you_sure.setMenu(null);
+                        smallwin.setMenu(null);
                     }
                 },
                 {
-                    label: 'Coming soon!'
+                    label: 'Block',
+                    click: function () {
+                        smallwin = new BrowserWindow({ width: 350, height: 300 });
+                        smallwin.loadURL(url.format({
+                            pathname: path.join(__dirname + '/src/pages/importblock.html'),
+                            protocol: 'file',
+                            slashes: true
+                        }));
+                        smallwin.setMenu(null);
+                    }
                 }
             ]
 
         },
         {
-            label:'Import',
-            click: function () {
-                smallwin = new BrowserWindow({width: 350, height: 300});
-                smallwin.loadURL(url.format({
-                    pathname: path.join(__dirname+'/src/pages/import.html'),
-                    protocol: 'file',
-                    slashes: true
-                }));
-                smallwin.setMenu(null);
-            }
-        },
-        {
-            label: 'Help',
-            click: function(){
-                require('electron').shell.openExternal('https://github.com/ThunbergOlle/mcPreview');
-            }
-        },
-        {
-            label: 'Debugging',
-            click: function(){
-                win.webContents.openDevTools();
-            }
+            label: 'Export',
+            submenu: [
+                {
+                    label: 'As .obj'
+
+                },
+                {
+                    label: 'As png'
+                }
+            ]
         },
         {
             label: 'Exit',
@@ -77,45 +72,73 @@ const mainMenutemplate = [{
                 app.quit();
             }
         }
-        ]
-    },
-    {
-        label: 'Window',
-        submenu: [
-            {
-                label: 'Reload',
-                click: function(){
-                    win.reload();
-                }
-            },
-        ]
-    }
+    ]
+},
+{
+    label: 'Settings',
+    submenu: [
+        {
+            label: 'Background'
+        }
+    ]
+},
+{
+    label: 'Window',
+    submenu: [
+        {
+            label: 'Reload',
+            click: function () {
+                win.reload();
+            }
+        },
+        {
+            label: 'Debugging',
+            click: function () {
+                win.webContents.openDevTools();
+            }
+        },
+        {
+            label: 'Help',
+            click: function () {
+                require('electron').shell.openExternal('https://github.com/ThunbergOlle/mcPreview');
+            }
+        }
+    ]
+}
 
 ];
 
+
+ipc.on('saveSkin', (event, data) => {
+    fs.writeFile('./src/models/steve.png', data.file, 'binary', function (err) {
+        if (err) throw err;
+        
+    });
+});
+ipc.on('reloadMainWindow', (event, data) => {
+    win.reload();
+
+});
+
+
 // Manage socket io stuff
-socket.on('connection', function(socket) {
+socket.on('connection', function (socket) {
 
 
-    socket.on('skinInput', (file) => {
+    socket.on('blockInput', (file) => {
         console.log(file.name);
         console.log(file.file);
-        fs.writeFile('./src/models/steve.png', file.file, 'binary', function(err) {
-            if(err) throw err;
-            socket.emit('skinInputSuccess',{
-                success: true
-            });
-            win.reload();
+        fs.writeFile('./src/models/block.png', file.file, 'binary', function (err) {
+            if (err) throw err;
+            socket.broadcast.emit('loadBlock');
         });
     });
-
-
 
 
     // ARE  YOU  SURE?
     socket.on('are_you_sure_block', () => {
         console.log("He/She is sure!");
-        socket.emit('loadBlock', {
+        socket.broadcast.emit('loadBlock', {
             success: true
         });
     });

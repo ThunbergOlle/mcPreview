@@ -12,38 +12,13 @@
 
     </head>
     <body>
-        <p>Please choose a skin to preview</p>
+        <p id="tmp">Please choose a skin to preview</p>
         <input type="file" id="fileinput" />
         <script src="" async defer></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
     <script>
+        require('../scripts/saveSkin.js');
 
-        // Socket setup
-        let socket = io.connect('http://127.0.0.1:4000/');
-
-        document.getElementById('fileinput').addEventListener('change', function(){
-            var file = this.files[0];
-            console.log(file);
-            socket.emit('skinInput',{
-                file: file,
-                size: file.size,
-                name: file.name,
-                type: file.type
-            });
-
-            console.log("name : " + file.name);
-            console.log("size : " + file.size);
-            console.log("type : " + file.type);
-            console.log("date : " + file.lastModified);
-            window.close();
-        }, false);
-
-
-        if (window.File && window.FileReader && window.FileList && window.Blob) {
-        // Great success! All the File APIs are supported.
-        } else {
-        alert('The File APIs are not fully supported in this browser.');
-        }
     </script>
     </body>
 </html>

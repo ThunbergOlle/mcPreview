@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Import Skin</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+    </head>
+    <body>
+        <p>Please choose a block to preview</p>
+        <input type="file" id="fileinput" />
+        <script src="" async defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+    <script>
+
+        // Socket setup
+        let socket = io.connect('http://127.0.0.1:4000/');
+
+        document.getElementById('fileinput').addEventListener('change', function(){
+            var file = this.files[0];
+            console.log(file);
+            socket.emit('blockInput',{
+                file: file,
+                size: file.size,
+                name: file.name,
+                type: file.type
+            });
+
+            console.log("name : " + file.name);
+            console.log("size : " + file.size);
+            console.log("type : " + file.type);
+            console.log("date : " + file.lastModified);
+            window.close();
+        }, false);
+
+
+        if (window.File && window.FileReader && window.FileList && window.Blob) {
+        // Great success! All the File APIs are supported.
+        } else {
+        alert('The File APIs are not fully supported in this browser.');
+        }
+    </script>
+    </body>
+</html>
