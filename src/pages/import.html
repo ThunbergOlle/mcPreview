@@ -1,24 +1,61 @@
 <!DOCTYPE html>
 
-<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>Import Skin</title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="">
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+<!--[if gt IE 8]><!-->
+<html class="no-js">
+<!--<![endif]-->
 
-    </head>
-    <body>
-        <p id="tmp">Please choose a skin to preview</p>
-        <input type="file" id="fileinput" />
-        <script src="" async defer></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Import Skin</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+        crossorigin="anonymous">
+
+</head>
+
+<body>
+    <p id="tmp">Please choose a skin to preview</p>
+    <input type="file" id="fileinput" onchange="handleFiles(this.files)" />
+    <button id="btn">Choose file.</button>
+    <script src="" async defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
     <script>
-        require('../scripts/saveSkin.js');
+        const electron = require('electron');
+        const remote = electron.remote
+        const ipc = electron.ipcRenderer;
+        const dialog = remote.dialog;
+        const fs = require('fs');
+        let tmp = document.getElementById('tmp');
+        const btn = document.getElementById('btn');
+        btn.addEventListener('click', () => {
+            dialog.showOpenDialog((fileNames) => {
+                if (fileNames === undefined) {
+                    alert('No file selected');
+                } else {
+                    readFile(fileNames[0]);
+                }
 
+            });
+        });
+        readFile = (filepath) => {
+            fs.readFile(filepath, (err, data) => {
+                if(err) alert(err);
+                fs.writeFile('./src/models/steve.png', data, (err) => {
+                    if(err) throw err;
+                    ipc.send('saveSkin');
+                });
+            });
+        }
+
+        if (window.File && window.FileReader && window.FileList && window.Blob) {
+            // Great success! All the File APIs are supported.
+        } else {
+            alert('The File APIs are not fully supported in this browser.');
+        }
     </script>
-    </body>
+</body>
+
 </html>

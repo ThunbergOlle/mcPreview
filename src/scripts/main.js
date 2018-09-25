@@ -1,5 +1,5 @@
 const electron = require('electron');
-const ips = electron.ipcRenderer;
+const ipc = electron.ipcRenderer;
 let socket = io.connect('http://127.0.0.1:4000/');
 let renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("mainCanvas"), antialias: true });
 renderer.setClearColor(0x000000);
@@ -32,11 +32,6 @@ loadSkin = () => {
         scene.add(obj);
         obj.position.set(0, 0, 0)
         render(obj);
-        socket.on('skinInputSuccess', function (data) {
-            console.log(data.success);
-            obj.material.map = THREE.ImageUtils.loadTexture('steve.png');
-            obj.material.needsUpdate = true;
-        });
     });
 }
 loadBlock = () => {
@@ -52,12 +47,22 @@ loadBlock = () => {
     scene.add(mesh);
 
 }
-loadSkin();
+
 function clearObject() {
     console.log('Clearing scene....')
     let model = scene.getObjectByName("model");
     scene.remove(model);
 }
+
+ipc.on('loadSkin',(event, data) => {
+    // window.reload();    
+    // clearObject();
+    // setTimeout(loadSkin(), 250);
+});
+
+
+loadSkin();
+
 socket.on('loadBlock', function (data) {
     console.log("We want to load the block model");
     clearObject();

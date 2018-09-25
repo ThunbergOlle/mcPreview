@@ -37,6 +37,7 @@ const mainMenutemplate = [{
                             slashes: true
                         }));
                         smallwin.setMenu(null);
+                        smallwin.openDevTools();
                     }
                 },
                 {
@@ -110,14 +111,12 @@ const mainMenutemplate = [{
 
 
 ipc.on('saveSkin', (event, data) => {
-    fs.writeFile('./src/models/steve.png', data.file, 'binary', function (err) {
-        if (err) throw err;
-        
-    });
+    console.log("SAVESKIN RECIEVED")
+    // win.webContents.send('loadSkin');
+    win.reload();
 });
 ipc.on('reloadMainWindow', (event, data) => {
     win.reload();
-
 });
 
 
