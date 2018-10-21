@@ -37,7 +37,6 @@ const mainMenutemplate = [{
                             slashes: true
                         }));
                         smallwin.setMenu(null);
-                        smallwin.openDevTools();
                     }
                 },
                 {
